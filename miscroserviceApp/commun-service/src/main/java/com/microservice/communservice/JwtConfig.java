@@ -1,4 +1,4 @@
-package com.microservice.geteway.security;
+package com.microservice.communservice;
 
 import org.springframework.beans.factory.annotation.Value;
 

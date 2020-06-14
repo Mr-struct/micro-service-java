@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.microservice.communservice.JwtConfig;
+
 @EnableWebSecurity 	
 public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
