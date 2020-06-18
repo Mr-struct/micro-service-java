@@ -12,7 +12,21 @@
   pip:
     name: docker
 
-- name: Docker | set swarm on
+- name: Docker | Check for Swarm
+  docker_swarm_info:
+    nodes: yes
+  register: swarm_info
+  run_once: true
+  ignore_errors: yes
+
+- name: Inform about basic flags
+  debug:
+    msg: |
+      Was able to talk to docker daemon: {{ swarm_info.can_talk_to_docker }}
+      Docker in Swarm mode: {{ swarm_info.docker_swarm_active }}
+      This is a Manager node: {{ swarm_info.docker_swarm_manager }}
+
+- name: Docker | set Swarm on
   docker_swarm:
     state: present
     advertise_addr: "{{ swarm_manager_ip }}"
@@ -24,7 +38,7 @@
 - name: Docker Swarm | generate token (and saving it)
   docker_swarm_info:
     nodes: yes
-  register: swarm_status
+  register: swarm_info
   run_once: true
 
 - name: Docker Swarm | Define swarm manager
@@ -32,14 +46,14 @@
     state: join
     debug: yes
     remote_addrs: "{{ hostvars[groups.docker-manager[0]] }}"
-    join_token: "{{ swarm_status.swarm_facts.JoinTokens.Manager }}"
-    advertise_addr: "{{ ansible_default_ipv4.address }}"
+    join_token: "{{ swarm_info.swarm_facts.JoinTokens.Manager }}"
+    advertise_addr: "{{ swarm_manager_ip }}"
   when: swarm_master is defined and swarm_master|bool == True
 
 - name: Docker Swarm | Adding swarm workers
   docker_swarm:
     state: join
     remote_addrs: "{{ hostvars[groups.docker-worker[0]] }}"
-    join_token: "{{ swarm_status.swarm_facts.JoinTokens.Worker }}"
-    advertise_addr: "{{ ansible_default_ipv4.address }}"
-  when: swarm_master is not defined
+    join_token: "{{ swarm_info.swarm_facts.JoinTokens.Worker }}"
+    advertise_addr: "{{ swarm_manager_ip }}"
+  when: ansible_default_ipv4.address != {{ swarm_manager_ip }}
