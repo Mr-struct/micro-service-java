@@ -1,0 +1,9 @@
+---
+
+docker_debian_repo_url: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
+docker_debian_repo_id: E1CF 20DD FFE4 B89E 8026  58F1 E0B1 1894 F66A EC98
+docker_debian_repo_repo: https://download.docker.com/linux/debian/gpg
+
+remot_user: user
+
+swarm_manager_ip: 10.100.200.3
