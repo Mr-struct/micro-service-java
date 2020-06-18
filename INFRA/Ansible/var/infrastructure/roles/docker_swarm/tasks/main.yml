@@ -9,25 +9,32 @@
       - curl
       - gnupg2
       - software-properties-common
+      - python3-setuptools
     state: present
     update_cache: yes
-#  register: result
-#  until: result is successful
+  register: result
+  
+- name: Debug | installing pre-reqs
+  debug: var=result verbosity=1
 
 - name: debian | adding docker apt-key
   apt_key:
     url: "{{ docker_debian_repo_url }}"
     id: "{{ docker_debian_repo_id }}"
     state: present
-#  register: result
-#  until: result is successful
+  register: result
+
+- name: Debug | adding docker apt-key
+  debug: var=result verbosity=1
 
 - name: debian | adding docker repo
   apt_repository:
     repo: "{{ docker_debian_repo_repo }}"
     state: present
-#  register: result
-#  until: result is successful
+  register: result
+
+- name: Debug | adding docker repo
+  debug: var=result verbosity=1
 
 - name: debian | installing docker
   apt:
@@ -37,8 +44,10 @@
       - docker-ce-cli
     state: present
     update_cache: yes
-#  register: result
-#  until: result is successful
+  register: result
+
+- name: Debug | installing docker
+  debug: var=result verbosity=1
 
 - name: users | adding docker users (for use without sudo)
   user:

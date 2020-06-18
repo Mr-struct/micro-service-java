@@ -7,10 +7,18 @@
       - python3-pip
     state: latest
     update_cache: yes
+  register: result
+
+- name: Debug | Install prerequisites SDK
+  debug: var=result verbosity=1
 
 - name: Docker SDK | install docker (python)
   pip:
     name: docker
+  register: result
+
+- name: Debug | SDK - install docker (python)
+  debug: var=result verbosity=1
 
 - name: Docker | Check for Swarm
   docker_swarm_info:
@@ -18,6 +26,9 @@
   register: swarm_info
   run_once: true
   ignore_errors: yes
+
+- name: Debug | Docker - Check for Swarm
+  debug: var=swarm_info verbosity=1
 
 - name: Inform about basic flags
   debug:
