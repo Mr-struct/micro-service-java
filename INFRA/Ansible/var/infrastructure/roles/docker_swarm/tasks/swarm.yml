@@ -1,0 +1,45 @@
+---
+
+- name: SDK Python | Install prerequisites
+  apt: 
+    name: 
+      - python-pip
+      - python3-pip
+    state: latest
+    update_cache: yes
+
+- name: Docker SDK | install docker (python)
+  pip:
+    name: docker
+
+- name: Docker | set swarm on
+  docker_swarm:
+    state: present
+    advertise_addr: "{{ swarm_manager_ip }}"
+    debug: yes
+  register: swarm_info
+  run_once: true
+  when: swarm_info.docker_swarm_active == false or swarm_info.docker_swarm_active is not defined
+
+- name: Docker Swarm | generate token (and saving it)
+  docker_swarm_info:
+    nodes: yes
+  register: swarm_status
+  run_once: true
+
+- name: Docker Swarm | Define swarm manager
+  docker_swarm:
+    state: join
+    debug: yes
+    remote_addrs: "{{ hostvars[groups.docker-manager[0]] }}"
+    join_token: "{{ swarm_status.swarm_facts.JoinTokens.Manager }}"
+    advertise_addr: "{{ ansible_default_ipv4.address }}"
+  when: swarm_master is defined and swarm_master|bool == True
+
+- name: Docker Swarm | Adding swarm workers
+  docker_swarm:
+    state: join
+    remote_addrs: "{{ hostvars[groups.docker-worker[0]] }}"
+    join_token: "{{ swarm_status.swarm_facts.JoinTokens.Worker }}"
+    advertise_addr: "{{ ansible_default_ipv4.address }}"
+  when: swarm_master is not defined

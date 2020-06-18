@@ -9,7 +9,7 @@
 
   tasks:
     - name: Install Python 2
-      raw: test -e /usr/python || (apt update && atp install -y python)
+      raw: test -e /usr/python || (apt update && atp install -y python sudo && echo "user     ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user && echo "Defaults 	insults" > /etc/sudoers.d/insults)
 
     - name: Fancy way of doing authorized_keys
       authorized_key: user=root
