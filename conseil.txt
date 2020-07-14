@@ -1,0 +1,4 @@
+- Le runer est une vm
+
+- Docker in docker (warning)
+

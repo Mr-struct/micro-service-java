@@ -12,6 +12,7 @@ public class JwtConfig {
     @Value("${security.jwt.prefix:Bearer }")
     private String prefix;
 
+    //TODO : réduire la durée du token < 10 min
     @Value("${security.jwt.expiration:#{24*60*60}}")
     private int expiration;
 

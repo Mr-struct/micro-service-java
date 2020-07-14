@@ -1,4 +1,4 @@
-package com.microservice.geteway.security;
+package com.microservice.gateway.security;
 
 import java.io.IOException;
 import java.util.List;

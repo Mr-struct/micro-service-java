@@ -1,4 +1,4 @@
-package com.microservice.geteway.security;
+package com.microservice.gateway.security;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
