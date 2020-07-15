@@ -16,3 +16,11 @@
     docker_debian_repo_url: https://download.docker.com/linux/ubuntu/gpg
     remot_user: user
     swarm_manager_ip: 10.100.200.3
+    gluster_volume_name: gluster_docker
+    gluster_brick_dir: /var/glusterfs
+    gluster_replicas: 3
+    gluster_nodes: 
+      - 10.100.200.1
+      - 10.100.200.2
+      - 10.100.200.3
+    gluster_mount_dir: /var/lib/docker/volumes

@@ -63,6 +63,11 @@
     state: started
     enabled: true
 
+- name: Install docker-compose
+  pip:
+    name: docker-compose
+    state: latest
+  when: ansible_default_ipv4.address == swarm_manager_ip
+
 - name: Docker | Swarm Initialisation
   include: swarm.yml
-

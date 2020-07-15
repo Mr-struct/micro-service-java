@@ -8,16 +8,45 @@
 - name: Debug | check glusterfs volumes
   debug: var=gluster_volume_info verbosity=1
 
-- name: Connect to Gluster peers.
-  shell: "gluster peer probe {{ item }}"
-  register: gluster_peer_probe
-  changed_when: "'already in peer list' not in gluster_peer_probe.stdout"
-  failed_when: false
-  with_items: groups.glusterfs
-  when: "'Volume Name: gluster' not in gluster_volume_info.stdout"
+- name: Create a trusted storage pool
+  gluster_peer:
+    state: present
+    nodes:
+      - 10.100.200.1
+      - 10.100.200.2
+      - 10.100.200.3
+  run_once: true
 
-- name: Debug | Gluster Peers
-  debug: var=groups.glusterfs verbosity=1
+# - name: Connect to Gluster peers.
+#   shell: "gluster peer probe {{ item }}"
+#   register: gluster_peer_probe
+#   changed_when: "'already in peer list' not in gluster_peer_probe.stdout"
+#   failed_when: false
+#   with_items: groups.glusterfs
+#   when: "'Volume Name: gluster' not in gluster_volume_info.stdout"
+
+# - name: Debug | Gluster Peers
+#   debug: var=groups.glusterfs verbosity=0
+
+- name: Create brick folder
+  file:
+    path: /var/glusterfs
+    state: directory
+
+- name: Create | Configure gluster volume
+  gluster_volume:
+    state: present
+    name: "{{ gluster_volume_name }}"
+    brick: "{{ gluster_brick_dir }}"
+    replicas: "{{ gluster_replicas }}"
+    cluster: "{{ gluster_nodes }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    transport: tcp
+  run_once: true
+  register: gluster_volume_create
+
+- name: Debug | Gluster volume
+  debug: var=gluster_volume_create verbosity=1
 
 # - name: Create Gluster volume.
 #   shell: "gluster volume create {{ gluster_brick_name }} {{ gluster_brick_config }}"
@@ -32,10 +61,10 @@
 #   when: "inventory_hostname == groups.webservers[0] and 'Volume Name: gluster' not in gluster_volume_info.stdout"
 
 # Mount configuration.
-# - name: Ensure the Gluster volume is mounted.
-#   mount:
-#     name: "{{ gluster_mount_dir }}"
-#     src: "{{ groups.webservers[0] }}:/{{ gluster_brick_name }}"
-#     fstype: glusterfs
-#     opts: "defaults,_netdev"
-#   state: mounted
+- name: Ensure the Gluster volume is mounted.
+  mount:
+    path: "{{ gluster_mount_dir }}"
+    src: "{{ ansible_default_ipv4.address }}:/{{ gluster_volume_name }}"
+    fstype: glusterfs
+    opts: "defaults,_netdev"
+    state: mounted

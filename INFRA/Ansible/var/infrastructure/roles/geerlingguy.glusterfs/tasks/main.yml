@@ -19,4 +19,4 @@
 # Configuration tasks.
 - name: GlusterFS | Volume configuration
   include: config.yml
-  
+
