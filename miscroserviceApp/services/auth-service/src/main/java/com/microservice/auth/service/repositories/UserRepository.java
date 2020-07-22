@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import com.microservice.auth.service.entities.AppUser;
 
+
+
 @Repository
 public interface UserRepository extends CrudRepository<AppUser, Long> {
 

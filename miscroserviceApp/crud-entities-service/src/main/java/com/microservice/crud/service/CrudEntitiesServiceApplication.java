@@ -1,16 +1,16 @@
-package com.microservice.communservice;
+package com.microservice.crud.service;
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
-
 @SpringBootApplication
 @EnableEurekaClient
-public class CommunServiceApplication {
+public class CrudEntitiesServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CommunServiceApplication.class, args);
+		SpringApplication.run(CrudEntitiesServiceApplication.class, args);
 	}
 
 }

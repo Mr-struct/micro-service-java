@@ -2,7 +2,10 @@ package com.microservice.auth.service.controller;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.sql.Date;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +20,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.microservice.auth.service.repositories.UserRepository;
+import com.microservice.auth.service.security.config.JwtUserDetailsService;
+import com.microservice.communservice.JwtConfig;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 
 import com.microservice.auth.service.entities.AppUser;
-import com.microservice.auth.service.entities.JwtUserDetails;
-import com.microservice.auth.service.entities.UserDetails;
-import com.microservice.auth.service.repositories.UserRepository;
-import com.microservice.auth.service.security.config.JwtTokenUtil;
-import com.microservice.auth.service.security.config.JwtUserDetailsService;
 
 @RestController
 @RequestMapping("/")
 public class AuthenticateController {
 
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
 	@Autowired
 	private JwtUserDetailsService jwtUserDetailsService;
 
@@ -42,44 +47,72 @@ public class AuthenticateController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private JwtConfig jwtConfig;
 
 	@GetMapping("/me")
-	public ResponseEntity<org.springframework.security.core.userdetails.UserDetails> getMeAsUser(Principal principal) {
-		JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(principal.getName());
-		if (userDetails != null) {
-			return new ResponseEntity<org.springframework.security.core.userdetails.UserDetails>(userDetails,
+	public ResponseEntity<UserDetails> getMeAsUser(HttpServletRequest request) {
+		 String token = request.getHeader(jwtConfig.getHeader());
+		 
+		if(token == null) {
+			return new ResponseEntity<UserDetails>(HttpStatus.BAD_REQUEST);
+		}
+		 String userName;
+         try {
+        	 userName = Jwts.parser()
+                     .setSigningKey(jwtConfig.getSecret().getBytes())
+                     .parseClaimsJws(token.replace(jwtConfig.getPrefix(), ""))
+                     .getBody()
+                     .getSubject();
+         } catch (SignatureException e) {
+ 			return new ResponseEntity<UserDetails>(HttpStatus.BAD_REQUEST);
+         }
+		UserDetails user = jwtUserDetailsService.loadUserByUsername(userName);
+		if (user != null) {
+			return new ResponseEntity<UserDetails>(user,
 					HttpStatus.OK);
 		}
-		return new ResponseEntity<org.springframework.security.core.userdetails.UserDetails>(HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<UserDetails>(HttpStatus.UNAUTHORIZED);
 
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<UserDetails> registerNewUser(@RequestBody AppUser user, HttpServletResponse response)
+	public ResponseEntity<com.microservice.auth.service.entities.UserDetails> registerNewUser(@RequestBody AppUser user, HttpServletResponse response)
 			throws IOException {
 		if (user != null && user.getUsername() != null && user.getPassword() != null && user.getRole() != null) {
 			AppUser isThereAnyUser = userRepository.findByUsername(user.getUsername());
 			if (isThereAnyUser == null) {
 				AppUser newUser = userRepository.save(
 						new AppUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), user.getRole()));
-				return new ResponseEntity<UserDetails>(new UserDetails(newUser.getUsername(), newUser.getRole()),
+				return new ResponseEntity<com.microservice.auth.service.entities.UserDetails>(new com.microservice.auth.service.entities.UserDetails(newUser.getUsername(), newUser.getRole()),
 						HttpStatus.CREATED);
 			} else {
 				response.sendError(HttpStatus.CONFLICT.value(), "Un utilisateur portant ce nom existe déjà");
 			}
 		}
-		return new ResponseEntity<UserDetails>(HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<com.microservice.auth.service.entities.UserDetails>(HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping("/authenticate")
 	public ResponseEntity<Token> authenticate(@RequestBody AppUser user) throws Exception {
 		if (user != null && user.getUsername() != null && user.getPassword() != null) {
-			JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(user.getUsername());
+			UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(user.getUsername());
 			if (userDetails != null) {
 				try {
 					authenticationManager.authenticate(
 							new UsernamePasswordAuthenticationToken(userDetails.getUsername(), user.getPassword()));
-					Token token = new Token(jwtTokenUtil.generateToken(userDetails));
+					Long now = System.currentTimeMillis();
+					Token token = new Token(Jwts.builder()
+							.setSubject(userDetails.getUsername())	
+							// Convert to list of strings. 
+							// This is important because it affects the way we get them back in the Gateway.
+							.claim("authorities", userDetails.getAuthorities().stream()
+								.map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+							.setIssuedAt(new Date(now))
+							.setExpiration(new Date(now + jwtConfig.getExpiration() * 1000))  // in milliseconds
+							.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
+							.compact());
 					return new ResponseEntity<Token>(token, HttpStatus.OK);
 				} catch (BadCredentialsException e) {
 					e.printStackTrace();
