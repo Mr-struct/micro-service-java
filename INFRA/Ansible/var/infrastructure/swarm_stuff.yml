@@ -1,0 +1,9 @@
+---
+
+- name: Swarm Services Setup
+  hosts: dockermanager
+  remote_user: user
+  become: True
+  roles:
+    # - visualisation
+    - docker_registry

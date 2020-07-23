@@ -1,0 +1,41 @@
+---
+# tasks file for ssl_for_reg
+
+- name: Docker | create certificate directory (to fool docker into thinking its official)
+  file:
+    path: "{{ ssl_destination }}"
+    state: directory
+
+- name: Swarm | create volume for certs (used by registry service)
+  file:
+    path: /var/lib/docker/volumes/certs
+    state: directory
+  when: ansible_default_ipv4.address == swarm_manager_ip
+
+- name: Docker | copy registry certificate.crt
+  copy:
+    src: "{{ ssl_location }}/registry.crt"
+    dest: "{{ ssl_destination }}/registry.crt"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Docker | copy registry certificate.key
+  copy:
+    src: "{{ ssl_location }}/registry.key"
+    dest: "{{ ssl_destination }}/registry.key"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Swarm | copy registry.crt for registry service
+  copy: 
+    src: "{{ ssl_location }}/registry.crt"
+    dest: /var/lib/docker/volumes/certs/registry.crt
+  when: ansible_default_ipv4.address == swarm_manager_ip
+
+- name: Swarm | copy registry.key for registry service
+  copy: 
+    src: "{{ ssl_location }}/registry.key"
+    dest: /var/lib/docker/volumes/certs/registry.key
+  when: ansible_default_ipv4.address == swarm_manager_ip
