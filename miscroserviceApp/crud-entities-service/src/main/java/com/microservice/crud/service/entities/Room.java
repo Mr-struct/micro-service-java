@@ -1,6 +1,5 @@
 package com.microservice.crud.service.entities;
 
-import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -29,6 +28,9 @@ public class Room {
 	
 	@Column(nullable = false)
 	private int capacity;
+
+	@Column(nullable = false)
+	private boolean taken;
 	
 	public Room() {
 		
@@ -38,8 +40,9 @@ public class Room {
 		super();
 		this.name = name;
 		this.roomCategory = roomCategory;
-		this.price = price;
+		this.price = price <= 0 ? roomCategory.getDefaultPrice() : price;
 		this.capacity = capacity;
+		this.taken = false;
 	}
 
 	public Long getId() {
@@ -72,4 +75,13 @@ public class Room {
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
+
+	public boolean isTaken() {
+		return taken;
+	}
+
+	public void setTaken(boolean taken) {
+		this.taken = taken;
+	}
+	
 }

@@ -1,4 +1,4 @@
-package com.microservice.auth.service.security.config;
+package com.microservice.crud.service.config;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,8 +42,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				// user passing user's credentials
 				// The filter needs this auth manager to authenticate the user.
 				.addFilter(new JwtAuthenticateFilter(authenticationManager(), jwtConfig)).authorizeRequests()
-				// allow all POST requests
-				.antMatchers("/**").permitAll()				// any other requests must be authenticated
+				// Hack for swagger 
+				.antMatchers(HttpMethod.GET,"/**").permitAll()// any other re
+				.antMatchers("/hostel/**").permitAll()
 				.anyRequest().authenticated();
 	}
 
@@ -59,6 +60,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userDetailsService).passwordEncoder(this.passwordEncoder());
 	}
 
+	@Bean
+	public UserDetailsService userDetailsService() {
+		// TODO Auto-generated method stub
+		return super.userDetailsService();
+	}
 	@Bean
 	public JwtConfig jwtConfig() {
 		return new JwtConfig();

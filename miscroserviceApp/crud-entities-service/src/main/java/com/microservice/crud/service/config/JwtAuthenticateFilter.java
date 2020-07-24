@@ -1,4 +1,4 @@
-package com.microservice.auth.service.security.config;
+package com.microservice.crud.service.config;
 
 import java.io.IOException;
 import java.sql.Date;

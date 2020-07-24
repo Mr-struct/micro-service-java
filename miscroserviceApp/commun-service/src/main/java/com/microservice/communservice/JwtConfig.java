@@ -1,23 +1,31 @@
 package com.microservice.communservice;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureException;
+import net.bytebuddy.implementation.bytecode.Throw;
 
 public class JwtConfig {
-    @Value("${security.jwt.uri:/auth/**}")
-    private String Uri;
+	@Value("${security.jwt.uri:/auth/**}")
+	private String Uri;
 
-    @Value("${security.jwt.header:Authorization}")
-    private String header;
+	@Value("${security.jwt.header:Authorization}")
+	private String header;
 
-    @Value("${security.jwt.prefix:Bearer }")
-    private String prefix;
+	@Value("${security.jwt.prefix:Bearer }")
+	private String prefix;
 
-    //TODO : réduire la durée du token < 10 min
-    @Value("${security.jwt.expiration:#{24*60*60}}")
-    private int expiration;
+	// TODO : réduire la durée du token < 10 min
+	@Value("${security.jwt.expiration:#{24*60*60}}")
+	private int expiration;
 
-    @Value("${security.jwt.secret:JwtSecretKey}")
-    private String secret;
+	@Value("${security.jwt.secret:JwtSecretKey}")
+	private String secret;
 
 	public String getUri() {
 		return Uri;
@@ -58,7 +66,24 @@ public class JwtConfig {
 	public void setSecret(String secret) {
 		this.secret = secret;
 	}
-	
+
+	public String getUserNameFromTokenHeader(HttpServletRequest request) {
+		String token = request.getHeader(getHeader());
+
+		if (token == null) {
+			return null;
+		}
+
+		String userName = null;
+		try {
+			userName = Jwts.parser().setSigningKey(getSecret().getBytes())
+					.parseClaimsJws(token.replace(getPrefix(), "")).getBody().getSubject();
+		} catch (SignatureException e) {
+			throw new SignatureException(e.getMessage());
+		}
+		return userName;
+	}
+
 //	package com.microservice.auth.service.security.config;
 //	import java.io.Serializable;
 //	import java.util.Date;

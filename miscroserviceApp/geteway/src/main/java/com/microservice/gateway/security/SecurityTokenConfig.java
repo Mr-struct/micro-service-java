@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,14 +33,12 @@ public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
 		   .addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
 		// authorization requests config
 		.authorizeRequests()
-		   // allow all who are accessing "auth" service
-		   .antMatchers("/auth/**", "/commun/**", "/crud/**").permitAll()  
-		   // must be an admin if trying to access admin area (authentication is also required here)
-		   .antMatchers("/gallery" + "/admin/**").hasRole("ADMIN")
+		   .antMatchers(jwtConfig.getUri()).permitAll()
+		   .antMatchers("/crud/**").permitAll()
 		   // Any other request must be authenticated
-		   .anyRequest().authenticated(); 
+		   .anyRequest().fullyAuthenticated(); 
 	}
-	
+
 	@Bean
   	public JwtConfig jwtConfig() {
     	   return new JwtConfig();

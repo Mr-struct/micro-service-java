@@ -26,8 +26,8 @@ public class RoomController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Room> getRoomById(@PathVariable("id") Long id) {
-		Room r = repo.findById(id).orElseGet(null);
-		if (r == null) {
+		Room r = repo.findById(id).orElse(new Room());
+		if (r.getId() == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<Room>(r, HttpStatus.OK);
@@ -84,9 +84,9 @@ public class RoomController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Room findRoom = repo.findById(id).orElse(null);
+		Room findRoom = repo.findById(id).orElse(new Room());
 
-		if (findRoom == null) {
+		if (findRoom.getId() == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		repo.delete(findRoom);

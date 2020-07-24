@@ -30,6 +30,9 @@ public class Hostel {
 	@OneToMany
 	private List<Room> rooms = new ArrayList<>();
 
+	public Hostel() {
+		
+	}
 	
 	public Hostel(String name, String phoneNumber, String address, List<Room> rooms) {
 		super();
@@ -37,6 +40,7 @@ public class Hostel {
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 		this.rooms = rooms;
+		
 	}
 
 	public Hostel(String name, String phoneNumber, String address, Room rooms) {

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.microservice.communservice.JwtConfig;
@@ -25,6 +26,7 @@ public class JwtTokenAuthenticationFilter extends  OncePerRequestFilter {
 		
 		public JwtTokenAuthenticationFilter(JwtConfig jwtConfig) {
 			this.jwtConfig = jwtConfig;
+
 		}
 
 		@Override
