@@ -1,10 +1,10 @@
 ---
-- name: Docker-compose | Create directory
+- name: Docker-Registry | Create compose directory
   file:
     path: /var/docker/docker_registry/
     state: directory
 
-- name: Docker-compose | Copy file
+- name: Docker-Registry | Copy compose file
   copy:
     src: /var/ansible/infrastructure/roles/docker_registry/files/Docker-compose.yml
     dest: /var/docker/docker_registry/Docker-compose.yml

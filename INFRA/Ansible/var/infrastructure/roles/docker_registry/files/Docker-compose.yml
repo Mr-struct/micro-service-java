@@ -4,7 +4,6 @@ volumes:
   registry:
 
 services:
-
   registry:
     image: registry:2
     deploy:

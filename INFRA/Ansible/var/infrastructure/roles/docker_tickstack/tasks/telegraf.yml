@@ -1,0 +1,18 @@
+---
+
+- name: Docker-TickStack | Copy Telegraf dockerfiles and stuff
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/telegraf/1.15/alpine/
+    dest: /var/docker/docker_tickstack/telegraf
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Docker-TickStack | Telegraf | Build and Push to repo
+  docker_image:
+    build:
+      path: /var/docker/docker_tickstack/telegraf
+    name: "{{ priv_reg }}/telegraf:1"
+    tag: v1
+    push: yes
+    source: build

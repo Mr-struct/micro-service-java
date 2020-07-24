@@ -1,0 +1,31 @@
+---
+# tasks file for docker_tickstack
+
+# les dockerfiles se trouvent ici : https://github.com/influxdata/influxdata-docker
+
+- name: Chronograf | Swarm Initialisation
+  include: chronograf.yml
+
+- name: Influxdb | Swarm Initialisation
+  include: influxdb.yml
+
+- name: Kapacitor | Swarm Initialisation
+  include: kapacitor.yml
+
+- name: Telegraf | Swarm Initialisation
+  include: telegraf.yml
+
+- name: Docker-TickStack | Copy compose file
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/Docker-compose.yml
+    dest: /var/docker/docker_tickstack/Docker-compose.yml
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Deploy stack from a compose file
+  docker_stack:
+    state: present
+    name: tickstack
+    compose:
+      - /var/docker/docker_tickstack/Docker-compose.yml

@@ -1,0 +1,18 @@
+---
+
+- name: Docker-TickStack | Copy Influxdb dockerfiles and stuff
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/influxdb/1.8/alpine/
+    dest: /var/docker/docker_tickstack/influxdb
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Docker-TickStack | Influxdb | Build and Push to repo
+  docker_image:
+    build:
+      path: /var/docker/docker_tickstack/influxdb
+    name: "{{ priv_reg }}/influxdb:1"
+    tag: v1
+    push: yes
+    source: build

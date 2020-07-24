@@ -8,7 +8,7 @@
     # - common
     # - docker_swarm
     # - geerlingguy.glusterfs
-    # - ssl_for_reg
+    - ssl_for_reg
   vars:
     docker_debian_repo_repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
     docker_debian_repo_id: 0EBFCD88

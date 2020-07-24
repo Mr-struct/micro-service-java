@@ -15,18 +15,18 @@
 - name: Docker | copy registry certificate.crt
   copy:
     src: "{{ ssl_location }}/registry.crt"
-    dest: "{{ ssl_destination }}/registry.crt"
+    dest: "{{ ssl_destination }}/ca.crt"
     owner: root
     group: root
     mode: '0644'
 
-- name: Docker | copy registry certificate.key
-  copy:
-    src: "{{ ssl_location }}/registry.key"
-    dest: "{{ ssl_destination }}/registry.key"
-    owner: root
-    group: root
-    mode: '0644'
+# - name: Docker | copy registry certificate.key
+#   copy:
+#     src: "{{ ssl_location }}/registry.key"
+#     dest: "{{ ssl_destination }}/registry.key"
+#     owner: root
+#     group: root
+#     mode: '0644'
 
 - name: Swarm | copy registry.crt for registry service
   copy: 
@@ -39,3 +39,14 @@
     src: "{{ ssl_location }}/registry.key"
     dest: /var/lib/docker/volumes/certs/registry.key
   when: ansible_default_ipv4.address == swarm_manager_ip
+
+# Add registry to hosts file
+
+- name: Registry | Add references to hosts file
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^10\.100\.200\.3    myregistry.com'
+    line: '10.100.200.3     myregistry.com'
+    owner: root
+    group: root
+    mode: 0644
