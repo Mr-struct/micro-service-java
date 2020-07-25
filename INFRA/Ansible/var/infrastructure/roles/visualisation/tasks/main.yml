@@ -1,10 +1,32 @@
 ---
 # tasks file for visualisation
 
-- name: Swarm | Visualisation
+- name: Inspect multiple images
+  docker_image_info:
+    name: "{{ priv_reg }}/visualizer"
+  register: visualizer
+
+- name: Debug | Visualizer
+  debug: var=visualizer verbosity=1
+
+- name: Swarm | Pull Visualiser en Push it locally
+  docker_image:
+    name: bretfisher/visualizer
+    repository: "{{ priv_reg }}/visualizer"
+    push: yes
+    source: pull
+  # when: visualizer.image == ""
+
+- name: Visualiser | remove public image
+  docker_image:
+    name: bretfisher/visualizer
+    state: absent
+    force_absent: yes
+
+- name: Visualiser | Launch service on Manager
   docker_swarm_service:
     name: visualisation
-    image: bretfisher/visualizer
+    image: "{{ priv_reg }}/visualizer"
     mounts:
       - source: /var/run/docker.sock
         target: /var/run/docker.sock

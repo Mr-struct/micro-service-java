@@ -1,12 +1,23 @@
 ---
 
-- name: Docker-TickStack | Copy Telegraf dockerfiles and stuff
+- name: Docker-TickStack | Copy Telegraf Dockerfile and stuff
   copy:
     src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/telegraf/1.15/alpine/
     dest: /var/docker/docker_tickstack/telegraf
     owner: root
     group: root
     mode: '0777'
+  register: telegraf
+
+- name: Debug | Telegraf Dockerfile
+  debug: var=telegraf verbosity=1
+
+- name: Docker-TickStack | remove Telegraf image
+  docker_image:
+    state: absent
+    name: "{{ priv_reg }}/telegraf:1"
+    tag: v1
+    force_absent: yes
 
 - name: Docker-TickStack | Telegraf | Build and Push to repo
   docker_image:
@@ -16,3 +27,4 @@
     tag: v1
     push: yes
     source: build
+  when: telegraf.changed
