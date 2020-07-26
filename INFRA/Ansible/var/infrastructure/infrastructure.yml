@@ -5,9 +5,9 @@
   remote_user: user
   become: True
   roles:
-    # - common
-    # - docker_swarm
-    # - geerlingguy.glusterfs
+    - common
+    - docker_swarm
+    - geerlingguy.glusterfs
     - ssl_for_reg
   vars:
     docker_debian_repo_repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
@@ -26,6 +26,6 @@
     ssl_location: /var/ansible/infrastructure/roles/ssl_for_reg/files
     ssl_destination: "/etc/docker/certs.d/myregistry.com:5000"
 
-# - import_playbook: gitlab.yml
+- import_playbook: gitlab.yml
 
 - import_playbook: swarm_stuff.yml

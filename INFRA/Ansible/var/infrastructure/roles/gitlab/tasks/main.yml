@@ -21,9 +21,14 @@
     url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh 
     dest: /tmp/script.deb.sh
     mode: '0440'
+  register: gitscript
+
+- name: Gitlab | Script download result
+  debug: var=gitscript verbosity=1
 
 - name: Gitlab | run installation script
   shell: bash /tmp/script.deb.sh
+  when: gitscript.changed
 
 - name: Gitlab | installation
   apt:
@@ -51,6 +56,8 @@
 
 - name: Gitlab | reconfiguration
   shell: gitlab-ctl reconfigure
+  when: gitscript.changed
 
 - name: Gitlab | restart
   shell: gitlab-ctl restart
+  when: gitscript.changed
