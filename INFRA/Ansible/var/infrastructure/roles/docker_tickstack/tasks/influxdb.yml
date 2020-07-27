@@ -1,0 +1,30 @@
+---
+
+- name: Docker-TickStack | Copy Influxdb Dockerfile and stuff
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/influxdb/1.8/alpine/
+    dest: /var/docker/docker_tickstack/influxdb
+    owner: root
+    group: root
+    mode: '0777'
+  register: influxdb
+
+- name: Debug | Influxdb Dockerfile
+  debug: var=influxdb verbosity=1
+
+- name: Docker-TickStack | remove Influxdb image
+  docker_image:
+    state: absent
+    name: "{{ priv_reg }}/influxdb:1"
+    tag: v1
+    force_absent: yes
+  
+- name: Docker-TickStack | Influxdb | Build and Push to repo
+  docker_image:
+    build:
+      path: /var/docker/docker_tickstack/influxdb
+    name: "{{ priv_reg }}/influxdb:1"
+    tag: v1
+    push: yes
+    source: build
+  when: influxdb.changed

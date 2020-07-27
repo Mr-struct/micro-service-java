@@ -1,0 +1,12 @@
+---
+
+- name: Swarm Services Setup
+  hosts: dockermanager
+  remote_user: user
+  become: True
+  roles:
+    - docker_registry
+    - visualisation
+    - docker_tickstack
+  vars:
+    priv_reg: myregistry.com:5000

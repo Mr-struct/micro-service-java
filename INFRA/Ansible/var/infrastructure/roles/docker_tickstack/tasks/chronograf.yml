@@ -1,0 +1,32 @@
+---
+
+- name: Docker-TickStack | Copy Chronograph Dockerfile and stuff
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/chronograf/1.8/alpine/
+    dest: /var/docker/docker_tickstack/chronograf
+    owner: root
+    group: root
+    mode: '0777'
+  register: chronograf
+
+- name: Debug | Chronograph Dockerfile
+  debug: var=chronograf verbosity=1
+
+- name: Docker-TickStack | remove Chronograf image
+  docker_image:
+    state: absent
+    name: "{{ priv_reg }}/chronograf:1"
+    tag: v1
+    force_absent: yes
+
+- name: Docker-TickStack | Chronograf | Build and Push to repo
+  docker_image:
+    build:
+      path: /var/docker/docker_tickstack/chronograf
+    name: "{{ priv_reg }}/chronograf:1"
+    tag: v1
+    push: yes
+    source: build
+  when: chronograf.changed
+
+

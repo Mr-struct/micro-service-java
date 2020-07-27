@@ -1,0 +1,44 @@
+---
+# Gluster volume configuration.
+- name: Check if Gluster volumes already exist.
+  shell: "gluster volume info"
+  changed_when: false
+  register: gluster_volume_info
+
+- name: Debug | check glusterfs volumes
+  debug: var=gluster_volume_info verbosity=1
+
+- name: Create a trusted storage pool
+  gluster_peer:
+    state: present
+    nodes: "{{ gluster_nodes }}"
+  run_once: true
+
+- name: Create brick folder
+  file:
+    path: /var/glusterfs
+    state: directory
+
+- name: Create | Configure gluster volume
+  gluster_volume:
+    state: present
+    name: "{{ gluster_volume_name }}"
+    brick: "{{ gluster_brick_dir }}"
+    replicas: "{{ gluster_replicas }}"
+    cluster: "{{ gluster_nodes }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    transport: tcp
+  run_once: true
+  register: gluster_volume_create
+
+- name: Debug | Gluster volume
+  debug: var=gluster_volume_create verbosity=1
+
+# Mount configuration.
+- name: Ensure the Gluster volume is mounted.
+  mount:
+    path: "{{ gluster_mount_dir }}"
+    src: "{{ ansible_default_ipv4.address }}:/{{ gluster_volume_name }}"
+    fstype: glusterfs
+    opts: "defaults,_netdev"
+    state: mounted

@@ -1,0 +1,13 @@
+---
+
+- name: Gitlab Setup
+  hosts: dockermanager
+  remote_user: user
+  become: True
+  roles:
+    - gitlab
+  vars:
+    gitlab_ext_url: "http://clo5-test.com"
+    gitlab_repertoire: /etc/gitlab
+    gitlab_port: 80
+    worker_timeout: 200 

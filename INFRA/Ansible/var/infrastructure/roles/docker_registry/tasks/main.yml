@@ -1,2 +1,20 @@
 ---
-# tasks file for docker_registry
+- name: Docker-Registry | Create compose directory
+  file:
+    path: /var/docker/docker_registry/
+    state: directory
+
+- name: Docker-Registry | Copy compose file
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_registry/files/Docker-compose.yml
+    dest: /var/docker/docker_registry/Docker-compose.yml
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: Deploy stack from a compose file
+  docker_stack:
+    state: present
+    name: registry
+    compose:
+      - /var/docker/docker_registry/Docker-compose.yml

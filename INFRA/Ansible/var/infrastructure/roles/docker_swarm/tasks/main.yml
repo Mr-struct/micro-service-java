@@ -12,6 +12,7 @@
       - python3-setuptools
     state: present
     update_cache: yes
+  ignore_errors: yes
   register: result
   
 - name: Debug | installing pre-reqs
@@ -44,6 +45,7 @@
       - docker-ce-cli
     state: present
     update_cache: yes
+  ignore_errors: yes
   register: result
 
 - name: Debug | installing docker
@@ -63,6 +65,15 @@
     state: started
     enabled: true
 
+- name: Install docker-compose and its dependencies
+  pip:
+    name:
+      - docker-compose
+      - pyyaml
+      - jsondiff
+      - tree
+    state: latest
+  when: ansible_default_ipv4.address == swarm_manager_ip
+
 - name: Docker | Swarm Initialisation
   include: swarm.yml
-

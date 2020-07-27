@@ -1,2 +1,63 @@
 ---
 # tasks file for gitlab
+
+- name: Gitlab | Install dependencies
+  apt:
+    name:
+      - curl
+      - openssh-server
+      - ca-certificates
+      - postfix
+    state: latest
+    update_cache: yes
+  ignore_errors: yes
+
+- name: Gitlab | Install python modules
+  pip:
+    name: python-gitlab
+
+- name: Gitlab | Download installation script
+  get_url:
+    url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh 
+    dest: /tmp/script.deb.sh
+    mode: '0440'
+  register: gitscript
+
+- name: Gitlab | Script download result
+  debug: var=gitscript verbosity=1
+
+- name: Gitlab | run installation script
+  shell: bash /tmp/script.deb.sh
+  when: gitscript.changed
+
+- name: Gitlab | installation
+  apt:
+    name:
+      - gitlab-ce
+    state: latest
+    update_cache: yes
+  ignore_errors: yes
+
+- name: Gitlab | External URL
+  lineinfile:
+    path: /etc/gitlab/gitlab.rb
+    regexp: '^external_url'
+    backrefs: yes
+    line: "external_url '{{ gitlab_ext_url }}:{{ gitlab_port }}'"
+    state: present
+
+- name: Gitlab | workers time out  (Error 502)
+  lineinfile:
+    path: /etc/gitlab/gitlab.rb
+    regexp: "^unicorn['worker_timeout']"
+    backrefs: yes
+    line: "unicorn['worker_timeout'] = {{ worker_timeout }}"
+    state: present
+
+- name: Gitlab | reconfiguration
+  shell: gitlab-ctl reconfigure
+  when: gitscript.changed
+
+- name: Gitlab | restart
+  shell: gitlab-ctl restart
+  when: gitscript.changed

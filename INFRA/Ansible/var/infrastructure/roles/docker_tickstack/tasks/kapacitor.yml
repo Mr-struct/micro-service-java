@@ -1,0 +1,30 @@
+---
+
+- name: Docker-TickStack | Copy Kapacitor Dockerfile and stuff
+  copy:
+    src: /var/ansible/infrastructure/roles/docker_tickstack/files/influxdata-docker/kapacitor/1.5/alpine/
+    dest: /var/docker/docker_tickstack/kapacitor
+    owner: root
+    group: root
+    mode: '0777'
+  register: kapacitor
+
+- name: Debug | Kapacitor Dockerfile
+  debug: var=kapacitor verbosity=1
+
+- name: Docker-TickStack | remove Kapacitor image
+  docker_image:
+    state: absent
+    name: "{{ priv_reg }}/kapacitor:1"
+    tag: v1
+    force_absent: yes
+
+- name: Docker-TickStack | Kapacitor | Build and Push to repo
+  docker_image:
+    build:
+      path: /var/docker/docker_tickstack/kapacitor
+    name: "{{ priv_reg }}/kapacitor:1"
+    tag: v1
+    push: yes
+    source: build
+  when: kapacitor.changed

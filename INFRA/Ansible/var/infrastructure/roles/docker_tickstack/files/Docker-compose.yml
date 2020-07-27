@@ -1,0 +1,40 @@
+version: "3.8"
+
+volumes:
+  influxdb:
+  chronograf:
+  kapacitor:
+
+services:
+  influxdb:
+    image: myregistry.com:5000/influxdb:1      
+    volumes:
+      - influxdb:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+  
+  chronograf:
+    image: myregistry.com:5000/chronograf:1
+    volumes:
+      - chronograf:/var/lib/chronograf
+    ports:
+      - "8888:8888"
+
+  kapacitor:
+    image: myregistry.com:5000/kapacitor:1   
+    volumes:
+      - kapacitor:/var/lib/kapacitor
+    ports: 
+      - "9092:9092"
+
+  telegraf:
+    image: myregistry.com:5000/telegraf:1   
+    ports: 
+      - "8125:8125/udp"
+      - "8094:8094"
+      - "8092:8092/udp"
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1

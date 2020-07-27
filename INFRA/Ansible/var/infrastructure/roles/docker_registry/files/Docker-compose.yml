@@ -1,0 +1,19 @@
+version: "3"
+
+volumes:
+  registry:
+
+services:
+  registry:
+    image: registry:2
+    deploy:
+      replicas: 1
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/registry.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/registry.key
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry:/var/lib/registry
+      - /var/lib/docker/volumes/certs:/certs:ro
