@@ -2,6 +2,7 @@ package com.microservice.crud.service.repositories;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,7 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
 	Room findRoomByName(String name);
 
 	@Transactional
+	@Modifying
 	@Query("UPDATE Room SET name = :name, roomCategory = :roomCategory, capacity = :capacity, price = :price WHERE id = :id")
 	void updateRoom(Long id, String name, RoomCategory roomCategory, int capacity, float price);
 	

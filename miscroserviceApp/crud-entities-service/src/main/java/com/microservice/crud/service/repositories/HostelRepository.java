@@ -4,6 +4,7 @@ package com.microservice.crud.service.repositories;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,7 @@ public interface HostelRepository extends CrudRepository<Hostel, Long> {
 	Hostel findHostelByName(String name);
 
 	@Transactional
-	@Query("UPDATE Hostel SET name = :name, phoneNumber = :phoneNumber, id = :id")
+	@Modifying
+	@Query("UPDATE Hostel SET name = :name, phoneNumber = :phoneNumber where id = :id")
 	void updateHostel(Long id, String name, String phoneNumber);
 }

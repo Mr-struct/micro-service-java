@@ -92,7 +92,7 @@ public class HostelController {
 		if (findHostel == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		repo.updateHostel(id, findHostel.getName(),findHostel.getPhoneNumber());
+		repo.updateHostel(id, hostel.getName(),hostel.getPhoneNumber());
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	

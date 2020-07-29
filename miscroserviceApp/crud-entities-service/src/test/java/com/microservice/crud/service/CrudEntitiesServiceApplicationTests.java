@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,7 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-//@Sql("tests.sql")
+@Sql("tests.sql")
 class CrudEntitiesServiceApplicationTests {
 	
 	@Autowired
@@ -73,7 +74,7 @@ class CrudEntitiesServiceApplicationTests {
 	    .andExpect(status().isNotFound());
 		
 		this.mockMvc
-	    .perform( MockMvcRequestBuilders.post("/hostel/1")
+	    .perform( MockMvcRequestBuilders.post("/hostel")
 	    		  .header("Authorization", "Bearer " + userToken)
 	              .content("{" + 
 	              		"  \"name\": \"Hotel1\"," + 
@@ -84,45 +85,31 @@ class CrudEntitiesServiceApplicationTests {
 	              		"      \"name\": \"Room1\"," + 
 	              		"      \"roomCategory\": \"SR\"," + 
 	              		"      \"price\": 50.0," + 
-	              		"      \"capacity\": 2," + 
+	              		"      \"capacity\": 2" + 
 	              		"    }" + 
 	              		"  ]" + 
 	              		"}")
 	              .contentType(MediaType.APPLICATION_JSON)
 	              .accept(MediaType.APPLICATION_JSON))
-	    .andExpect(status().isOk());
+	    .andExpect(status().isCreated());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.get("/hostel/1")
-	    		.header("Authorization", "Bearer " + userToken))
-	    .andExpect(status().isOk());
-	    
-	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.put("/hostel/1")
+	    .perform( MockMvcRequestBuilders.put("/hostel/22")
 	    		  .header("Authorization", "Bearer " + userToken)
 	              .content("{" + 
-	              		"  \"name\": \"Hotel1\"," + 
+	              		"  \"name\": \"TestHotel\"," + 
 	              		"  \"phoneNumber\": \"0622222222\"," + 
-	              		"  \"address\": \"Rue de la mairie\"," + 
-	              		"  \"rooms\": [" + 
-	              		"    {" + 
-	              		"      \"name\": \"Room1\"," + 
-	              		"      \"roomCategory\": \"SR\"," + 
-	              		"      \"price\": 50.0," + 
-	              		"      \"capacity\": 2," + 
-	              		"    }" + 
-	              		"  ]" + 
+	              		"  \"address\": \"Rue de la mairie\"" +  
 	              		"}")
 	              .contentType(MediaType.APPLICATION_JSON)
 	              .accept(MediaType.APPLICATION_JSON))
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.get("/hostel/1")
+	    .perform( MockMvcRequestBuilders.get("/hostel/22")
 	    		  .header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk())
-	    .andExpect(MockMvcResultMatchers.jsonPath("$.hostel.phoneNumber").value("0622222222"))
-	    .andExpect(MockMvcResultMatchers.jsonPath("$.room.price").value(75.0));
+	    .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value("0622222222"));
 	    
 	    this.mockMvc
 	    .perform( MockMvcRequestBuilders.get("/hostel/getAll")
@@ -130,12 +117,12 @@ class CrudEntitiesServiceApplicationTests {
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.delete("/hostel/1")
+	    .perform( MockMvcRequestBuilders.delete("/hostel/22")
 	    		.header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.get("/hostel/1")
+	    .perform( MockMvcRequestBuilders.get("/hostel/22")
 	    		.header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isNotFound());
 	}
@@ -155,39 +142,38 @@ class CrudEntitiesServiceApplicationTests {
 	    .andExpect(status().isNotFound());
 		
 		this.mockMvc
-	    .perform( MockMvcRequestBuilders.delete("/")
-	    		.header("Authorization", "Bearer " + userToken))
-	    .andExpect(status().isBadRequest());
-		
-		this.mockMvc
 	    .perform( MockMvcRequestBuilders.delete("/1")
 	    		.header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isNotFound());
 		
 		this.mockMvc
-	    .perform( MockMvcRequestBuilders.post("/1")
+	    .perform( MockMvcRequestBuilders.post("/")
 	    		  .header("Authorization", "Bearer " + userToken)
-	              .content("{\"hostel\": {\"name\": \"HostelName\",\"phoneNumber\": \"0611111111\"," + 
+	              .content("{\"hostel\": { " +
+	              		"    \"id\" : 24," +
+	              		"    \"name\": \"Hotel45\",\"phoneNumber\": \"0611111111\"," + 
 	              		"    \"address\": \"Rue du test\"," + 
 	              		"    \"rooms\": [" + 
-	              		"      {" + 
-	              		"        \"name\": \"RoomName\"," + 
+	              		"      {"  + 
+	              		"        \"id\" : 24, " + 
+	              		"        \"name\": \"Room41\"," + 
 	              		"        \"roomCategory\": \"SR\"," + 
 	              		"        \"price\": 50.0," + 
-	              		"        \"capacity\": 3," + 
+	              		"        \"capacity\": 2" + 
 	              		"      }" + 
 	              		"    ]" + 
 	              		"  }," + 
-	              		"  \"room\": {" + 
-	              		"    \"name\": \"RoomName\"," + 
+	              		"  \"room\": {" +
+	              		"    \"id\" : 24, " + 
+	              		"    \"name\": \"Room41\"," + 
 	              		"    \"roomCategory\": \"SR\"," + 
 	              		"    \"price\": 50.0," + 
-	              		"    \"capacity\": 3," + 
+	              		"    \"capacity\": 2" + 
 	              		"  }" + 
 	              		"}")
 	              .contentType(MediaType.APPLICATION_JSON)
 	              .accept(MediaType.APPLICATION_JSON))
-	    .andExpect(status().isOk());
+	    .andExpect(status().isCreated());
 	    
 	    this.mockMvc
 	    .perform( MockMvcRequestBuilders.get("/1")
@@ -204,7 +190,7 @@ class CrudEntitiesServiceApplicationTests {
 	              		"        \"name\": \"RoomName\"," + 
 	              		"        \"roomCategory\": \"SR\"," + 
 	              		"        \"price\": 75.0," + 
-	              		"        \"capacity\": 3," + 
+	              		"        \"capacity\": 3" + 
 	              		"      }" + 
 	              		"    ]" + 
 	              		"  }," + 
@@ -212,7 +198,7 @@ class CrudEntitiesServiceApplicationTests {
 	              		"    \"name\": \"RoomName\"," + 
 	              		"    \"roomCategory\": \"SR\"," + 
 	              		"    \"price\": 75.0," + 
-	              		"    \"capacity\": 3," + 
+	              		"    \"capacity\": 3" + 
 	              		"  }" + 
 	              		"}")
 	              .contentType(MediaType.APPLICATION_JSON)
@@ -231,7 +217,7 @@ class CrudEntitiesServiceApplicationTests {
 	    		.header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk());
 	    
-	    this.mockMvc
+	    /*this.mockMvc
 	    .perform( MockMvcRequestBuilders.delete("/1")
 	    		.header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk());
@@ -239,7 +225,7 @@ class CrudEntitiesServiceApplicationTests {
 	    this.mockMvc
 	    .perform( MockMvcRequestBuilders.get("/1")
 	    		.header("Authorization", "Bearer " + userToken))
-	    .andExpect(status().isNotFound());
+	    .andExpect(status().isNotFound());*/
 	}
 	
 	@Test
@@ -269,22 +255,27 @@ class CrudEntitiesServiceApplicationTests {
 	    this.mockMvc
 	    .perform( MockMvcRequestBuilders.post("/room")
 	    		  .header("Authorization", "Bearer " + userToken)
-	              .content("{\"name\":\"TestRoom\",\"roomCategory\":\"SR\",\"price\": 50.0,\"capacity\": 2}")
+	              .content("{\"name\":\"Room1\",\"roomCategory\":\"SR\",\"price\": 50.0,\"capacity\": 2}")
 	              .contentType(MediaType.APPLICATION_JSON)
 	              .accept(MediaType.APPLICATION_JSON))
 	    .andExpect(status().isCreated());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.get("/room/1")
+	    .perform( MockMvcRequestBuilders.get("/room/22")
 	    		  .header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.put("/room/1")
+	    .perform( MockMvcRequestBuilders.put("/room/22")
 	    		  .header("Authorization", "Bearer " + userToken)
 	              .content("{\"name\":\"TestRoom\",\"roomCategory\":\"SR\",\"price\": 75.0,\"capacity\": 2}")
 	              .contentType(MediaType.APPLICATION_JSON)
 	              .accept(MediaType.APPLICATION_JSON))
+	    .andExpect(status().isOk());
+	    
+	    this.mockMvc
+	    .perform( MockMvcRequestBuilders.get("/room/22")
+	    		  .header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk())
 	    .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(75.0));
 	    
@@ -294,12 +285,12 @@ class CrudEntitiesServiceApplicationTests {
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.delete("/room/1")
+	    .perform( MockMvcRequestBuilders.delete("/room/22")
 	    		  .header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isOk());
 	    
 	    this.mockMvc
-	    .perform( MockMvcRequestBuilders.get("/room/1")
+	    .perform( MockMvcRequestBuilders.get("/room/22")
 	    		  .header("Authorization", "Bearer " + userToken))
 	    .andExpect(status().isNotFound());
 	}

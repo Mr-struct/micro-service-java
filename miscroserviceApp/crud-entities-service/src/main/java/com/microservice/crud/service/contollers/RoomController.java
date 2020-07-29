@@ -51,7 +51,7 @@ public class RoomController {
 
 		Room findRoom = repo.findRoomByName(room.getName());
 
-		if (findRoom == null) {
+		if (findRoom != null) {
 			return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
 		}
 
@@ -72,8 +72,8 @@ public class RoomController {
 		if (findRoom == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		repo.updateRoom(id, findRoom.getName(), findRoom.getRoomCategory(), findRoom.getCapacity(),
-				findRoom.getPrice());
+		repo.updateRoom(id, room.getName(), room.getRoomCategory(), room.getCapacity(),
+				room.getPrice());
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	
