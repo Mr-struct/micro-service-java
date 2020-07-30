@@ -14,33 +14,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.microservice.communservice.JwtConfig;
 
-@EnableWebSecurity 	// Enable security config. This annotation denotes config for spring security.
+@EnableWebSecurity
 public class SecurityTokenConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JwtConfig jwtConfig;
- 
+
 	@Override
-  	protected void configure(HttpSecurity http) throws Exception {
-    	   http
-		.csrf().disable()
-		    // make sure we use stateless session; session won't be used to store user's state.
-	 	    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) 	
-		.and()
-		    // handle an authorized attempts 
-		    .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)) 	
-		.and()
-		   // Add a filter to validate the tokens with every request
-		   .addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
-		// authorization requests config
-		.authorizeRequests()
-		   .antMatchers(jwtConfig.getUri()).permitAll()
-		   .antMatchers("/crud/**").permitAll()
-		   // Any other request must be authenticated
-		   .anyRequest().fullyAuthenticated(); 
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable()
+
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().exceptionHandling()
+				.authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)).and()
+				.addFilterAfter(new JwtTokenAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests().antMatchers(jwtConfig.getUri()).permitAll().antMatchers("/crud/**").permitAll()
+				.anyRequest().fullyAuthenticated();
 	}
 
 	@Bean
-  	public JwtConfig jwtConfig() {
-    	   return new JwtConfig();
-  	}
+	public JwtConfig jwtConfig() {
+		return new JwtConfig();
+	}
 }

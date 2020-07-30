@@ -1,3 +1,0 @@
----
-    #You can use variables to enable passing group specifiers via the -e argument to ansible-playbook
-    hosts_list:!{{ excluded }}:&{{ required }}:&{{ required }}

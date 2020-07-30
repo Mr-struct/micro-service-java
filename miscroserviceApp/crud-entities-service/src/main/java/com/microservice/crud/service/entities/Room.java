@@ -44,6 +44,17 @@ public class Room {
 		this.capacity = capacity;
 		this.taken = false;
 	}
+	
+	
+
+	public Room(Long id, String name, RoomCategory roomCategory, float price, int capacity) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.roomCategory = roomCategory;
+		this.price = price;
+		this.capacity = capacity;
+	}
 
 	public Long getId() {
 		return id;

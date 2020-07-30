@@ -9,6 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 
 @Entity
@@ -17,12 +20,14 @@ public class Reservation {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "hostel_id", referencedColumnName = "id")
 	private Hostel hostel;
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "room_id", referencedColumnName = "id")
 	private Room room;
+	
+	@CreationTimestamp
 	private Date reservationDate;
 	
 	public Reservation() {
@@ -30,7 +35,6 @@ public class Reservation {
 	}
 	
 	public Reservation(Hostel hostel, Room room, Date reservationDate) {
-		super();
 		this.hostel = hostel;
 		this.room = room;
 		this.reservationDate = reservationDate;
@@ -60,5 +64,4 @@ public class Reservation {
 	public void setReservationDate(Date reservationDate) {
 		this.reservationDate = reservationDate;
 	}
-	
 }

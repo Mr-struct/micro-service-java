@@ -15,24 +15,21 @@ import com.microservice.auth.service.repositories.UserRepository;
 import com.microservice.auth.service.entities.AppUser;
 
 @Service
-public class JwtUserDetailsService implements UserDetailsService{
+public class JwtUserDetailsService implements UserDetailsService {
 
-		@Autowired
-		private UserRepository userRepository;
-	
+	@Autowired
+	private UserRepository userRepository;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		AppUser user = userRepository.findByUsername(username);
 
-		if(user != null){
+		if (user != null) {
 			List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-                	.commaSeparatedStringToAuthorityList("ROLE_" + user.getRole());
-		
-		// The "User" class is provided by Spring and represents a model class for user to be returned by UserDetailsService
-		// And used by auth manager to verify and check user authentication.
-		return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
-		}
-		else
+					.commaSeparatedStringToAuthorityList("ROLE_" + user.getRole());
+
+			return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
+		} else
 			throw new UsernameNotFoundException("L'utilisateur portant le nom " + username + " n'existe pas");
 	}
 }

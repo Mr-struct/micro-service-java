@@ -34,6 +34,13 @@ public class Hostel {
 		
 	}
 	
+	public Hostel(String name, String phoneNumber, String address) {
+		super();
+		this.name = name;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
+	}
+
 	public Hostel(String name, String phoneNumber, String address, List<Room> rooms) {
 		super();
 		this.name = name;

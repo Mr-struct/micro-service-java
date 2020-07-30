@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.microservice.crud.service.entities.Hostel;
@@ -21,8 +22,8 @@ import com.microservice.crud.service.entities.Reservation;
 import com.microservice.crud.service.entities.Room;
 import com.microservice.crud.service.repositories.HostelRepository;
 import com.microservice.crud.service.repositories.ReservationRepository;
-
-@RestController
+@RequestMapping("/reservation")
+@RestController()
 public class ReservationController {
 	
 	@Autowired
@@ -89,7 +90,7 @@ public class ReservationController {
 //		repo.updateReservation(id, findReservation.getName(),findReservation.getPhoneNumber());
 //		return new ResponseEntity<Void>(HttpStatus.OK);
 //	}
-	
+//	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
 

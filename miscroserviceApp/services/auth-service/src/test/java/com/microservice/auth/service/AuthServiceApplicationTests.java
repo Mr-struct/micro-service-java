@@ -17,6 +17,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.microservice.auth.service.entities.AppUser;
+import com.microservice.auth.service.repositories.UserRepository;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,7 +28,7 @@ public class AuthServiceApplicationTests {
   
   @Autowired
   protected MockMvc mockMvc;
-
+  @Autowired UserRepository userRepository;
     
   @Test
   protected void testAuthenticate() throws Exception {
@@ -61,6 +64,10 @@ public class AuthServiceApplicationTests {
     .andExpect(status().isOk())
     .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("user"))
     .andExpect(MockMvcResultMatchers.jsonPath("$.password").exists()); 
+    AppUser userTest = userRepository.findByUsername("userTest");
+    userRepository.deleteById(userTest.getId());
+    AppUser admin = userRepository.findByUsername("user");
+    userRepository.deleteById(admin.getId());
   }
   
   
