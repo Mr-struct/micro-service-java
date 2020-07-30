@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+    mysql-standalone:
+        image: mysql:latest
+        restart: always
+        environment:
+            MYSQL_DATABASE: 'CLODB'
+            MYSQL_USER: 'Clo5'
+            MYSQL_ROOT_PASSWORD: 'password'
+            MYSQL_PASSWORD: 'password'
+        ports:
+            - '3306:3306'
+        expose:
+            - '3306'
+
+    springboot-docker-container:
+        image: springboot-docker-container
+        ports:
+            - XXXX:XXXX
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        depends_on:
+            - mysql-standalone1
